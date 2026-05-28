@@ -1,0 +1,273 @@
+# ====================== 编译参数 ======================
+CONFIG_TARGET_OPTIMIZATION="-O3 -pipe -march=armv8-a+crypto+crc -mcpu=cortex-a53+crypto+crc -mtune=cortex-a53"
+                                       # ARM架构优化参数：
+                                       # -O3: 最高级别优化
+                                       # -pipe: 使用管道而非临时文件加速编译
+                                       # -march: ARMv8-A架构，支持加密和CRC指令
+                                       # -mcpu: Cortex-A53 CPU，支持加密和CRC
+                                       # -mtune: 针对Cortex-A53优化
+CONFIG_CCACHE=y                        # 启用编译器缓存加速编译
+CONFIG_DEVEL=y                         # 开启开发者模式（显示高级配置选项）
+CONFIG_FEED_video=n                    # 禁用视频软件源
+CONFIG_TARGET_MULTI_PROFILE=y          # 允许为多个设备生成固件
+CONFIG_TARGET_PER_DEVICE_ROOTFS=y      # 为每个设备单独生成根文件系统
+CONFIG_TARGET_ROOTFS_INITRAMFS=n       # 不打包 initramfs 内核镜像
+CONFIG_TARGET_OPTIONS=y                # 目标平台选项 - 开启设备平台定制配置
+CONFIG_PACKAGE_default-settings=y      # 系统基础默认配置 - 保障路由器基础运行功能
+CONFIG_PACKAGE_default-settings-chn=y  # 国内适配配置 - 时区校准、软件源适配国内网络环境
+CONFIG_LUCI_LANG_zh_Hant=n             # 繁体中文语言包 - 仅保留简体中文
+
+# ====================== ZRAM 内存压缩 ======================
+CONFIG_PACKAGE_zram-swap=y             # ZRAM交换分区脚本 - 利用内存压缩扩充可用运行内存
+CONFIG_PACKAGE_kmod-lib-lz4=y          # LZ4压缩解压内核驱动模块
+CONFIG_KERNEL_ZRAM_BACKEND_LZ4=y       # ZRAM后端采用LZ4压缩算法
+CONFIG_KERNEL_ZRAM_BACKEND_LZO=n       # ZRAM后端LZO算法 - 性能不及LZ4，关闭
+CONFIG_KERNEL_ZRAM_DEF_COMP_LZ4=y      # ZRAM默认压缩格式设为LZ4
+
+# ====================== 一、USB 核心驱动 ======================
+CONFIG_PACKAGE_kmod-usb-core=y         # USB 总线基础内核驱动
+CONFIG_PACKAGE_kmod-usb2=y             # USB 2.0 控制器驱动（兼容 USB 2.0 设备）
+CONFIG_PACKAGE_kmod-usb3=y             # USB 3.0 高速控制器驱动
+CONFIG_PACKAGE_kmod-usb-dwc3=y         # 设计架构 USB3 双角色控制器驱动
+CONFIG_PACKAGE_kmod-usb-ehci=y         # USB 2.0 增强型控制器驱动
+CONFIG_PACKAGE_kmod-usb-xhci=y         # USB 3.0 扩展主机控制器驱动
+CONFIG_PACKAGE_kmod-usb-ohci=n         # 无 USB 1.1 控制器，关闭
+CONFIG_PACKAGE_kmod-usb-uhci=n         # 无 USB 1.1 控制器，关闭
+
+# ====================== 二、USB 有线网卡驱动 ======================
+CONFIG_PACKAGE_kmod-usb-net=y                  # USB 转以太网通用驱动
+CONFIG_PACKAGE_kmod-usb-net-asix=y             # ASIX 品牌 USB 网卡通用驱动
+CONFIG_PACKAGE_kmod-usb-net-asix-ax88179=y     # AX88179 千兆 USB3 网卡专用驱动
+CONFIG_PACKAGE_kmod-usb-net-cdc-ether=y        # CDC 协议 USB 网卡驱动
+CONFIG_PACKAGE_kmod-usb-net-ipheth=y           # 苹果设备 USB 网络共享驱动
+CONFIG_PACKAGE_kmod-usb-net-rndis=y            # RNDIS 协议 USB 网络设备驱动
+CONFIG_PACKAGE_kmod-usb-net-rtl8150=y          # 瑞昱 8150 系列 USB 网卡驱动
+CONFIG_PACKAGE_kmod-usb-net-rtl8152=y          # 瑞昱 8152 系列千兆 USB 网卡驱动
+
+# 4G/5G 蜂窝模块（家用无需求，全部关闭）
+CONFIG_PACKAGE_kmod-usb-net-cdc-eem=n           # CDC 以太网仿真模型（4G 模块用，关闭）
+CONFIG_PACKAGE_kmod-usb-net-cdc-mbim=n          # 移动宽带接口模型 MBIM（4G 模块用，关闭）
+CONFIG_PACKAGE_kmod-usb-net-cdc-ncm=n           # CDC 网络控制模型 NCM（4G 模块用，关闭）
+CONFIG_PACKAGE_kmod-usb-net-cdc-subset=n        # 精简版 CDC 以太网驱动（4G 模块用，关闭）
+CONFIG_PACKAGE_kmod-usb-net-huawei-cdc-ncm=n    # 华为设备 NCM 驱动（4G 模块用，关闭）
+CONFIG_PACKAGE_kmod-usb-net-qmi-wwan=n          # 高通 QMI 协议广域网驱动（4G 模块用，关闭）
+CONFIG_PACKAGE_kmod-usb-net-qmi-wwan-fibocom=n  # 广和通 Fibocom 模块 QMI 驱动（关闭）
+CONFIG_PACKAGE_kmod-usb-net-qmi-wwan-quectel=n  # 移远 Quectel 模块 QMI 驱动（关闭）
+CONFIG_PACKAGE_kmod-usb-net-sierrawireless=n    # Sierra Wireless 无线模块驱动（关闭）
+
+# ====================== 三、USB 存储设备驱动 ======================
+CONFIG_PACKAGE_kmod-usb-storage=y        # USB 大容量存储设备基础驱动
+CONFIG_PACKAGE_kmod-usb-storage-uas=y    # UASP 高速 USB 磁盘协议驱动，提升传输速度
+CONFIG_PACKAGE_kmod-usb-storage-extras=y # 拓展读卡器类 USB 存储设备驱动
+
+# ====================== 四、网络核心与 nftables 防火墙 ======================
+# 基础网络内核模块
+CONFIG_PACKAGE_kmod-dsa=y                 # 分布式交换机架构驱动
+CONFIG_PACKAGE_kmod-dummy=y               # 虚拟哑网卡设备驱动
+CONFIG_PACKAGE_kmod-veth=y                # 成对虚拟以太隧道网卡驱动
+CONFIG_PACKAGE_kmod-tun=y                 # TUN/TAP 虚拟隧道设备驱动
+CONFIG_PACKAGE_kmod-inet-diag=y           # TCP 网络连接状态监控模块
+CONFIG_PACKAGE_kmod-bonding=y             # 多网卡链路聚合内核驱动
+CONFIG_PACKAGE_proto-bonding=n            # 网卡聚合 netifd 协议组件（家用无需）
+CONFIG_PACKAGE_kmod-netlink-diag=y        # 网络链路诊断监控模块
+CONFIG_PACKAGE_kmod-inet-mptcp-diag=n     # 多路径 TCP 调试模块（家用无用）
+CONFIG_PACKAGE_kmod-wireguard=n           # WireGuard VPN（与 zerotier 二选一，关闭）
+CONFIG_PACKAGE_luci-proto-wireguard=n     # WireGuard 协议 LuCI 支持（关闭）
+
+# nftables 防火墙模块（精简常用部分）
+CONFIG_PACKAGE_kmod-nft-core=y            # nftables 防火墙核心模块
+CONFIG_PACKAGE_kmod-nft-nat=y             # nftables NAT 功能
+CONFIG_PACKAGE_kmod-nft-fullcone=y        # 全锥型 NAT，优化 P2P 联机
+CONFIG_PACKAGE_kmod-nft-tproxy=y          # 透明代理转发内核模块
+CONFIG_PACKAGE_kmod-nft-connlimit=y       # 网络连接数限制模块
+CONFIG_PACKAGE_kmod-nft-fib=y             # 路由表匹配过滤模块
+CONFIG_PACKAGE_kmod-nft-offload=y         # 路由 NAT 硬件加速卸载模块
+CONFIG_PACKAGE_kmod-nft-socket=y          # 套接字匹配（sing-box 生态趋势所需）
+# 以下为家用无用模块，全部关闭
+CONFIG_PACKAGE_kmod-nft-arp=n             # ARP 协议过滤（企业级功能，关闭）
+CONFIG_PACKAGE_kmod-nft-bridge=n          # 网桥表过滤（家用无需，关闭）
+CONFIG_PACKAGE_kmod-nft-dup-inet=n        # 数据包复制（调试功能，关闭）
+CONFIG_PACKAGE_kmod-nft-netdev=n          # 网卡底层过滤（家用无需，关闭）
+CONFIG_PACKAGE_kmod-nft-queue=n           # 用户态数据包队列（调试用，关闭）
+CONFIG_PACKAGE_kmod-nft-xfrm=n            # IPsec 隧道匹配（无需求，关闭）
+
+# ====================== 五、存储文件系统驱动 ======================
+# 硬盘控制器驱动（ZN-M2 无 SATA/NVMe 接口，全部关闭）
+CONFIG_PACKAGE_kmod-ata-core=n            # SATA/IDE 通用控制器驱动（无接口，关闭）
+CONFIG_PACKAGE_kmod-ata-ahci=n            # AHCI 协议 SATA 驱动（无接口，关闭）
+CONFIG_PACKAGE_kmod-nvme=n                # NVMe 固态硬盘驱动（无接口，关闭）
+
+# 文件系统驱动
+CONFIG_PACKAGE_kmod-fs-btrfs=y            # Btrfs 文件系统驱动
+CONFIG_PACKAGE_btrfs-progs=y              # Btrfs 用户态管理工具集
+CONFIG_PACKAGE_kmod-fs-exfat=y            # exFAT 文件系统驱动（现代 U 盘常用）
+CONFIG_PACKAGE_kmod-fs-ext4=y             # EXT4 文件系统驱动
+CONFIG_PACKAGE_e2fsprogs=y                # ext2/3/4 工具集（格式化、检查、修复）
+CONFIG_PACKAGE_kmod-fuse=y                # 用户态文件系统驱动
+CONFIG_PACKAGE_kmod-fs-ntfs3=y            # NTFS 读写完整支持
+CONFIG_PACKAGE_kmod-fs-vfat=y             # FAT32 文件系统驱动
+CONFIG_PACKAGE_dosfstools=y               # FAT32 工具（mkfs.vfat / fsck.vfat）
+CONFIG_PACKAGE_kmod-fs-ksmbd=n            # 内核 SMB（与 Samba4 二选一，关闭）
+CONFIG_PACKAGE_kmod-mtd-rw=y              # 临时解锁闪存写入权限
+
+# 音频驱动（无需求关闭）
+CONFIG_PACKAGE_kmod-sound-core=n          # ALSA 音频核心驱动（无音频设备，关闭）
+
+# ====================== 六、系统基础工具与运行组件 ======================
+# 命令行工具
+CONFIG_PACKAGE_nano-full=y                # 完整版 nano 文本编辑器（语法高亮、中文兼容）
+CONFIG_PACKAGE_tmux=y                     # 终端会话多路复用器（后台保活会话）
+CONFIG_PACKAGE_htop=y                     # 交互式进程资源监控面板
+CONFIG_PACKAGE_iperf3=y                   # 局域网带宽测速工具
+CONFIG_PACKAGE_dmesg=y                    # 内核环形缓冲区查看工具
+CONFIG_PACKAGE_zoneinfo-asia=y            # 亚洲时区数据库
+CONFIG_PACKAGE_btop=n                     # 高颜值系统监控器（可选，空间充裕可改为 y）
+CONFIG_PACKAGE_ariang=n                   # Aria2 网页下载面板（无下载需求，关闭）
+CONFIG_PACKAGE_fstrim=n                   # SSD 固态硬盘 TRIM 优化（机械盘无需，关闭）
+CONFIG_PACKAGE_hdparm=n                   # 硬盘读写参数调节工具（无需安装，关闭）
+
+# 网络与安全工具
+CONFIG_PACKAGE_curl=y                     # 命令行 HTTP/HTTPS 请求工具
+CONFIG_PACKAGE_ip-full=y                  # 完整版 ip 路由控制命令
+CONFIG_PACKAGE_openssh-keygen=y           # OpenSSH 密钥生成工具
+CONFIG_PACKAGE_openssh-sftp-server=y      # OpenSSH SFTP 文件传输服务
+CONFIG_PACKAGE_openssl-util=y             # OpenSSL 命令行加密/证书工具
+CONFIG_PACKAGE_luci-app-acme=n            # ACME SSL 证书申请面板（无需求，关闭）
+CONFIG_PACKAGE_acme-acmesh-dnsapi=n       # DNS 域名证书申请接口（关闭）
+
+# USB 硬件管理
+CONFIG_PACKAGE_usb-modeswitch=y           # USB 模式切换工具（上网卡模式切换）
+CONFIG_PACKAGE_usbutils=y                 # USB 设备列表工具集（lsusb 等）
+
+# 压缩与识别工具
+CONFIG_PACKAGE_xz-utils=y                 # XZ 高压缩率解压压缩工具
+CONFIG_PACKAGE_blkid=y                    # 块设备 UUID 和文件系统识别工具
+
+# 系统性能优化
+CONFIG_PACKAGE_autocore=y                  # 自动 CPU 负载均衡脚本
+CONFIG_PACKAGE_automount=y                 # 外接存储自动挂载热插拔服务
+CONFIG_PACKAGE_coremark=y                  # CPU 性能跑分测试工具
+CONFIG_PACKAGE_cpufreq=y                   # CPU 频率调节命令行工具
+CONFIG_PACKAGE_luci-app-cpufreq=y          # CPU 频率调节网页管理面板
+CONFIG_PACKAGE_irqbalance=y                # 硬件中断多核均衡服务（提升响应速度）
+CONFIG_PACKAGE_luci-app-irqbalance=y       # 中断均衡网页管理界面
+
+# LuCI 基础框架
+CONFIG_PACKAGE_luci-base=y                 # LuCI 网页后台核心运行库
+CONFIG_PACKAGE_luci-compat=y               # LuCI 旧插件兼容适配库
+CONFIG_PACKAGE_luci-lib-base=y             # LuCI 基础功能依赖库
+CONFIG_PACKAGE_luci-lib-ipkg=y             # 软件包管理兼容接口
+CONFIG_PACKAGE_luci-lua-runtime=y          # Lua 脚本运行环境
+CONFIG_PACKAGE_luci-proto-relay=n          # 虚拟网桥中继协议（家用无需，关闭）
+CONFIG_PACKAGE_luci-app-uhttpd=y           # uHTTPd Web 服务器（OpenWrt 默认，LuCI 强依赖）
+
+# ====================== 七、磁盘管理工具套件 ======================
+# 分区工具
+CONFIG_PACKAGE_fdisk=y                     # 传统磁盘分区创建管理工具
+CONFIG_PACKAGE_cfdisk=y                    # 交互式可视化分区工具（ncurses 界面）
+CONFIG_PACKAGE_gdisk=y                     # GPT 格式大硬盘分区工具（文本交互）
+CONFIG_PACKAGE_sfdisk=n                    # 脚本化批量分区操作工具（无用，关闭）
+CONFIG_PACKAGE_cgdisk=n                    # GPT 交互式分区工具（冗余，关闭）
+CONFIG_PACKAGE_sgdisk=n                    # GPT 脚本分区工具（冗余，关闭）
+
+# 文件系统格式化修复
+CONFIG_PACKAGE_exfat-fsck=y                # exFAT 文件系统错误检测修复工具
+CONFIG_PACKAGE_exfat-mkfs=y                # exFAT 分区格式化工具
+
+# 磁盘信息与健康监控
+CONFIG_PACKAGE_lsblk=y                     # 列出所有块设备及分区信息
+CONFIG_PACKAGE_libnvme=n                   # NVMe 固态硬盘底层调用库（无 NVMe，关闭）
+CONFIG_PACKAGE_nvme-cli=n                  # NVMe 命令行管理工具（无 NVMe，关闭）
+CONFIG_PACKAGE_smartmontools=y             # 硬盘 S.M.A.R.T. 健康状态检测工具
+CONFIG_PACKAGE_smartmontools-drivedb=y     # 硬盘型号识别数据库
+
+# 专用存储工具（无对应硬件，关闭）
+CONFIG_PACKAGE_mmc-utils=n                 # MMC/SD 存储卡管理工具（无设备，关闭）
+CONFIG_PACKAGE_nand-utils=n                # NAND 闪存专用工具（无需求，关闭）
+
+# iOS 设备互联（无需求，关闭）
+CONFIG_PACKAGE_libimobiledevice=n          # 苹果设备连接协议库（无需求，关闭）
+CONFIG_PACKAGE_usbmuxd=n                   # 苹果设备 USB 多路连接服务（无需求，关闭）
+
+# ====================== 八、LuCI 网页功能插件 ======================
+# 8.1 代理科学上网
+CONFIG_PACKAGE_luci-app-homeproxy=y        # 高性能一体化代理面板（适配 ARM64）
+CONFIG_PACKAGE_luci-app-passwall2=y        # PassWall2 精简代理插件（备用上网方案）
+CONFIG_PACKAGE_luci-app-openclash=n        # Clash 代理客户端（选用其他代理，关闭）
+CONFIG_PACKAGE_luci-app-passwall=n         # 旧版 PassWall 插件（不重复安装，关闭）
+CONFIG_PACKAGE_luci-app-nikki=n            # Nikki 代理工具（舍弃，关闭）
+CONFIG_PACKAGE_luci-app-momo=n             # Momo 代理工具（舍弃，关闭）
+
+# 8.2 DNS 解析与广告过滤
+CONFIG_PACKAGE_luci-app-smartdns=n         # 智能 DNS 加速解析面板
+CONFIG_PACKAGE_adguardhome=y               # 全局广告追踪拦截 DNS 服务
+CONFIG_PACKAGE_luci-app-adguardhome=y      # AdGuardHome 网页管理界面
+
+# 8.3 动态域名
+CONFIG_PACKAGE_luci-app-ddns-go=y          # Go 版高性能动态域名解析
+CONFIG_PACKAGE_luci-app-ddns=n             # 传统 DDNS 脚本插件（替换为新版，关闭）
+
+# 8.4 异地组网
+CONFIG_PACKAGE_zerotier=y                  # ZeroTier 全球虚拟局域网组网服务
+CONFIG_PACKAGE_luci-app-zerotier=y         # ZeroTier 网页管理面板
+CONFIG_PACKAGE_tailscale=n                 # Tailscale 组网工具（二选一，关闭）
+CONFIG_PACKAGE_luci-app-frps=n             # FRP 内网穿透服务端（无需求，关闭）
+CONFIG_PACKAGE_luci-app-frpc=n             # FRP 内网穿透客户端（无需求，关闭）
+
+# 8.5 NAS 文件共享
+CONFIG_PACKAGE_luci-app-samba4=y           # Samba4 局域网文件共享服务
+CONFIG_PACKAGE_luci-app-nfs=n              # NFS 网络文件共享（Samba 更通用，关闭）
+CONFIG_PACKAGE_luci-app-minidlna=n         # 多媒体投屏共享（无需求，关闭）
+CONFIG_PACKAGE_luci-app-filemanager=y      # 文件管理器（支持上传、下载、编辑的 Web 工具）
+CONFIG_PACKAGE_luci-app-filebrowser-go=n   # Go 版网页网盘管理器（冗余，关闭）
+CONFIG_PACKAGE_luci-app-mini-diskmanager=y # 简易磁盘管理面板
+CONFIG_PACKAGE_luci-app-diskman=n          # 完整磁盘管理器（冗余，关闭）
+CONFIG_PACKAGE_luci-app-partexp=n          # 分区扩容工具（日常无需，关闭）
+
+# 8.6 网盘与下载（无需求，关闭）
+CONFIG_PACKAGE_luci-app-rclone=n           # 网盘同步工具（无需求，关闭）
+CONFIG_PACKAGE_luci-app-transmission=n     # BT 下载工具（无需求，关闭）
+CONFIG_PACKAGE_luci-app-aria2=n            # 多协议下载器（无需求，关闭）
+
+# 8.7 防火墙与端口映射
+CONFIG_PACKAGE_luci-app-upnp=y             # 自动端口映射（游戏联机必备）
+CONFIG_PACKAGE_luci-app-arpbind=n          # IP-MAC 地址绑定（暂不使用，关闭）
+CONFIG_PACKAGE-luci-app-banip=n            # 恶意 IP 封禁插件（按需关闭）
+CONFIG_PACKAGE_luci-app-eqos=n             # 简易网速限速（无需关闭）
+CONFIG_PACKAGE_luci-app-sqm=n              # 宽带队列调速（暂不配置，关闭）
+CONFIG_PACKAGE_luci-app-gecoosac=n         # 集客无线 AC 控制器（家用无需，关闭）
+CONFIG_PACKAGE_luci-app-unblockneteasemusic=y # 网易云音乐地域解锁插件
+
+# 8.8 系统监控（按需关闭）
+CONFIG_PACKAGE_luci-app-netdata=n         # 全维度系统资源监控面板（冗余，关闭）
+CONFIG_PACKAGE-luci-app-vnstat2=n         # 全网流量统计记录工具（无需，关闭）
+CONFIG_PACKAGE-luci-app-watchcat=n        # 掉线自动检测重启工具（无需，关闭）
+
+# 8.9 定时维护与远程管理
+CONFIG_PACKAGE_luci-app-hd-idle=y         # 硬盘闲置自动休眠省电
+CONFIG_PACKAGE_luci-app-wolplus=y         # 增强版远程开机唤醒
+CONFIG_PACKAGE_luci-app-wol=n             # 基础网络开机（已有 wolplus，关闭）
+CONFIG_PACKAGE-luci-app-autoreboot=y      # 定时自动重启系统面板
+CONFIG_PACKAGE-luci-app-ttyd=y            # 网页在线终端控制台
+CONFIG_PACKAGE-luci-app-commands=n        # 网页自定义命令面板（安全考虑，关闭）
+CONFIG_PACKAGE-luci-app-attendedsysupgrade=n # 在线升级保留配置（关闭）
+CONFIG_PACKAGE-luci-app-3cat=n            # 3CAT 工具集（功能重复，关闭）
+
+# 8.10 Docker（按需开启，默认关闭）
+CONFIG_PACKAGE_dockerd=n                  # Docker 容器引擎（未使用，关闭）
+CONFIG_PACKAGE_docker=n                   # Docker 命令行工具（关闭）
+CONFIG_PACKAGE_luci-app-dockerman=n       # Docker 网页管理器（关闭）
+
+# 8.11 推送通知
+CONFIG_PACKAGE_luci-app-wechatpush=n      # 微信消息告警推送（无需求，关闭）
+
+# 8.12 其他工具
+CONFIG_PACKAGE_luci-app-vlmcsd=n          # KMS 系统激活服务（无需，关闭）
+CONFIG_PACKAGE-luci-app-usb-printer=n     # USB 打印机共享（无需，关闭）
+CONFIG_PACKAGE-luci-app-wifischedule=n    # WiFi 定时开关（无需，关闭）
+
+# 8.13 主题美化
+CONFIG_PACKAGE_luci-theme-argon=y          # Argon 简约美观后台主题
+CONFIG_PACKAGE_luci-app-argon-config=y     # Argon 主题自定义设置
+CONFIG_PACKAGE_luci-theme-aurora=y         # Aurora 新潮风格后台主题
+CONFIG_PACKAGE_luci-app-aurora-config=y    # Aurora 主题配置面板
