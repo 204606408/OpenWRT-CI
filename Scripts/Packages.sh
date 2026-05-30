@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2026 VIKINGYFY
 
-#安装和更新软件包
+#安装和更新软件包（支持已存在目录时自动 git pull）
 UPDATE_PACKAGE() {
 	local PKG_NAME=$1
 	local PKG_REPO=$2
@@ -13,32 +13,53 @@ UPDATE_PACKAGE() {
 
 	echo " "
 
-	# 删除本地可能存在的不同名称的软件包
+	# 删除本地可能存在的不同名称的软件包（清理 feeds 中的旧版本）
 	for NAME in "${PKG_LIST[@]}"; do
-		# 查找匹配的目录
 		echo "Search directory: $NAME"
 		local FOUND_DIRS=$(find ../feeds/luci/ ../feeds/packages/ -maxdepth 3 -type d -iname "*$NAME*" 2>/dev/null)
 
-		# 删除找到的目录
 		if [ -n "$FOUND_DIRS" ]; then
 			while read -r DIR; do
 				rm -rf "$DIR"
 				echo "Delete directory: $DIR"
 			done <<< "$FOUND_DIRS"
 		else
-			echo "Not fonud directory: $NAME"
+			echo "Not found directory: $NAME"
 		fi
 	done
 
-	# 克隆 GitHub 仓库
-	git clone --depth=1 --single-branch --branch $PKG_BRANCH "https://github.com/$PKG_REPO.git"
+	# 决定是更新还是克隆
+	if [ -d "$REPO_NAME" ]; then
+		# 仓库目录已存在，执行 git pull 更新
+		echo "Directory $REPO_NAME already exists, pulling latest changes..."
+		cd "$REPO_NAME"
+		git checkout "$PKG_BRANCH" 2>/dev/null || true
+		git pull --ff-only
+		cd ..
+		# 对于 pkg 类型，仍需从仓库中提取子目录（覆盖更新）
+		if [[ "$PKG_SPECIAL" == "pkg" ]]; then
+			find ./$REPO_NAME/*/ -maxdepth 3 -type d -iname "*$PKG_NAME*" -prune -exec cp -rf {} ./ \;
+			rm -rf ./$REPO_NAME/
+		fi
+	elif [ -d "$PKG_NAME" ]; then
+		# 包名目录已存在（当 PKG_SPECIAL 为 name 时可能出现）
+		echo "Directory $PKG_NAME already exists, pulling latest changes..."
+		cd "$PKG_NAME"
+		git checkout "$PKG_BRANCH" 2>/dev/null || true
+		git pull --ff-only
+		cd ..
+	else
+		# 目录不存在，全新克隆
+		echo "Cloning fresh copy of $PKG_NAME..."
+		git clone --depth=1 --single-branch --branch "$PKG_BRANCH" "https://github.com/$PKG_REPO.git"
 
-	# 处理克隆的仓库
-	if [[ "$PKG_SPECIAL" == "pkg" ]]; then
-		find ./$REPO_NAME/*/ -maxdepth 3 -type d -iname "*$PKG_NAME*" -prune -exec cp -rf {} ./ \;
-		rm -rf ./$REPO_NAME/
-	elif [[ "$PKG_SPECIAL" == "name" ]]; then
-		mv -f $REPO_NAME $PKG_NAME
+		# 处理克隆的仓库
+		if [[ "$PKG_SPECIAL" == "pkg" ]]; then
+			find ./$REPO_NAME/*/ -maxdepth 3 -type d -iname "*$PKG_NAME*" -prune -exec cp -rf {} ./ \;
+			rm -rf ./$REPO_NAME/
+		elif [[ "$PKG_SPECIAL" == "name" ]]; then
+			mv -f $REPO_NAME $PKG_NAME
+		fi
 	fi
 }
 
